@@ -40,8 +40,13 @@ if __name__ == '__main__':
                 print(f'Run {i // 10 + 1} contains data for {len(stock)} points')
                 # Remove nulls (dividents/splits are not filtered properly - don't care for now*)
                 stock = stock[~stock.isna().all(axis=1) & (stock.index >= datetime.datetime(2000, 1, 1))]
+                # Remove tickers with no data in the entire range (bankrupt, removed, who knows)
+                stock = stock.loc[:,~stock.isna().all(axis=0)]
+
                 # print(f'Run {i//10+1} trimmed to {len(stock)} points') - not needed - should always be 261
                 stock_num = set(stock.columns.get_level_values(0))
+                if len(stock_num) != 10:
+                    print(f'\t{len(stock_num)} Tickers left after removal of null-data Tickers')
 
                 # Set stock list to stock if first set, otherwise merge
                 if len(stock_final) == 0:
