@@ -19,7 +19,7 @@ if __name__ == '__main__':
     companies = pd.read_csv(io.StringIO(s.decode('utf-8')))
     Symbols = companies['Symbol'].tolist()
 
-    t0 = time.time()
+    t0 = time.perf_counter()
 
     # create empty dataframe
     stock_final = pd.DataFrame()
@@ -30,14 +30,14 @@ if __name__ == '__main__':
         # print(Symbols[i:i+10])
         tickers = Symbols[i:i + 10]
         # print the symbol which is being downloaded
-        print(f'Beginning Download of {", ".join(tickers)}')
+        print(f'[{time.perf_counter()-t0:=6.2f}s] Beginning Download of {", ".join(tickers)}')
 
         try:
             # download the stock price
             stock = []
             stock = yf.download(" ".join(tickers), period='max', interval='1mo', progress=False, group_by='ticker')
             if len(stock) > 0:
-                print(f'Run {i // 10 + 1} contains data for {len(stock)} points')
+                # print(f'\tRun {i // 10 + 1} contains data for {len(stock)} points') - uncomment to see original points
                 # Remove nulls (dividents/splits are not filtered properly - don't care for now*)
                 stock = stock[~stock.isna().all(axis=1) & (stock.index >= datetime.datetime(2000, 1, 1))]
                 # Remove tickers with no data in the entire range (bankrupt, removed, who knows)
@@ -46,7 +46,7 @@ if __name__ == '__main__':
                 # print(f'Run {i//10+1} trimmed to {len(stock)} points') - not needed - should always be 261
                 stock_num = set(stock.columns.get_level_values(0))
                 if len(stock_num) != 10:
-                    print(f'\t{len(stock_num)} Tickers left after removal of null-data Tickers')
+                    print(f'\t\t{len(stock_num)} Tickers left after removal of null-data Tickers')
 
                 # Set stock list to stock if first set, otherwise merge
                 if len(stock_final) == 0:
@@ -60,9 +60,7 @@ if __name__ == '__main__':
             None
         if i == 100:
             break
-    t1 = time.time()
-
-    total = t1 - t0
+    total = time.perf_counter() - t0
 
 #     # %%
 #
