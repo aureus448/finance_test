@@ -62,7 +62,7 @@ if __name__ == '__main__':
 #     # %%
 #
 #     stock_final.Name.unique()
-#
+#.
 #     # %%
 #
 #     len(stock_final)
